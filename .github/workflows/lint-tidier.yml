@@ -11,14 +11,14 @@ on:
 
 jobs:
   conan-recipe-version:
-    uses: ultimaker/cura/.github/workflows/conan-recipe-version.yml@main
+    uses: lulzbot3d/cura-le-workflows/.github/workflows/conan-recipe-version.yml@main
     with:
-      project_name: dulcificum
+      project_name: dulcificumle
 
   lint-tidier-job:
     name: Auto-apply clang-tidy
-
     runs-on: ubuntu-latest
+    needs: conan-recipe-version
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -63,8 +63,8 @@ jobs:
 
       - name: Get Conan configuration
         run: |
-          conan config install https://github.com/Ultimaker/conan-config.git
-          conan config install https://github.com/Ultimaker/conan-config.git -a "-b runner/${{ runner.os }}/${{ runner.arch }}"
+          conan config install https://github.com/lulzbot3d/conan-config-le.git
+          conan config install https://github.com/lulzbot3d/conan-config-le.git -a "-b runner/${{ runner.os }}/${{ runner.arch }}"
 
       - name: Install dependencies
         run: conan install . ${{ needs.conan-recipe-version.outputs.recipe_id_full }} -s build_type=Release --build=missing --update -g GitHubActionsRunEnv -g GitHubActionsBuildEnv

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(dulcificum)
+project(dulcificumle)
 
 find_package(standardprojectsettings REQUIRED)
 option(EXTENSIVE_WARNINGS "Build with all warnings" ON)
@@ -25,7 +25,7 @@ find_package(range-v3 REQUIRED)
 find_package(ctre REQUIRED)
 
 # --- Setup the shared C++ mgjtp library ---
-set(DULCIFICUM_SRC
+set(DULCIFICUMLE_SRC
         src/gcode/ast/ast.cpp
         src/gcode/ast/entries.cpp
         src/gcode/parse.cpp
@@ -38,26 +38,26 @@ set(DULCIFICUM_SRC
         src/utils/io.cpp
         src/command_types.cpp
 )
-add_library(dulcificum ${DULCIFICUM_SRC})
-target_link_libraries(dulcificum
+add_library(dulcificumle ${DULCIFICUMLE_SRC})
+target_link_libraries(dulcificumle
         PUBLIC
         nlohmann_json::nlohmann_json
         ctre::ctre
         range-v3::range-v3
         spdlog::spdlog)
 
-target_include_directories(dulcificum
+target_include_directories(dulcificumle
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_compile_definitions(dulcificum PRIVATE DULCIFICUM_VERSION="${DULCIFICUM_VERSION}")
+target_compile_definitions(dulcificumle PRIVATE DULCIFICUM_VERSION="${DULCIFICUM_VERSION}")
 
-use_threads(dulcificum)
-enable_sanitizers(dulcificum)
+use_threads(dulcificumle)
+enable_sanitizers(dulcificumle)
 if (${EXTENSIVE_WARNINGS})
-    set_project_warnings(dulcificum)
+    set_project_warnings(dulcificumle)
 endif ()
 
 # --- Setup Python bindings ---

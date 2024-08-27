@@ -10,5 +10,5 @@ if (${EXTENSIVE_WARNINGS})
     set_project_warnings(translator)
 endif ()
 
-target_link_libraries(translator PUBLIC dulcificum docopt_s spdlog::spdlog)
+target_link_libraries(translator PUBLIC dulcificumle docopt_s spdlog::spdlog)
 target_compile_definitions(translator PRIVATE APP_VERSION="${APP_VERSION}")

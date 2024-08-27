@@ -11,7 +11,7 @@ from conan.errors import ConanException
 from conan.tools.files import copy
 
 
-class DulcificumTestConan(ConanFile):
+class DulcificumLETestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators =  "VirtualRunEnv"
     test_type = "explicit"
@@ -41,4 +41,4 @@ class DulcificumTestConan(ConanFile):
             self.run("python test.py", env = "conanrun", output = test_buf, run_environment = True)
             ret_val = test_buf.getvalue()
             if "gcode_2_miracle_jtp" not in ret_val:
-                raise ConanException("pyDulcificum wasn't build correctly!")
+                raise ConanException("pyDulcificum wasn't built correctly!")

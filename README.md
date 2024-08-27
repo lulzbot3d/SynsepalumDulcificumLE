@@ -1,14 +1,15 @@
-# Synsepalum Dulcificum
+# Synsepalum Dulcificum LE
 
-## Taste ye the Miracle Fruit!
+## Taste ye the Miracle Fruit
 
 Dulcificum changes the ~flavor~, or dialect, of 3d printer commmands.
 
 Supported dialects include:
+
 + MiracleGrue jsontoolpath dialect
 + UltiMaker GCode dialect
 
-## build
+## Build
 
 ```angular2html
 mkdir build

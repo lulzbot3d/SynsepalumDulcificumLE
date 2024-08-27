@@ -14,13 +14,13 @@ from jinja2 import Template
 required_conan_version = ">=1.58.0 <2.0.0"
 
 
-class DulcificumConan(ConanFile):
-    name = "dulcificum"
+class DulcificumLEConan(ConanFile):
+    name = "dulcificumle"
     description = "Dulcificum changes the flavor, or dialect, of 3d printer commands"
-    author = "UltiMaker"
+    author = "UltiMaker, FAME3D LLC."
     license = ""
-    url = "https://github.com/Ultimaker/synsepalum-dulcificum"
-    homepage = "https://ultimaker.com"
+    url = "https://github.com/lulzbot3d/SynsepalumDulcificumLE"
+    homepage = "https://lulzbot.com/"
     topics = ("cura", "curaengine", "gcode-generation", "3D-printing", "miraclegrue", "toolpath")
     package_type = "library"
     settings = "os", "arch", "compiler", "build_type"
@@ -103,11 +103,11 @@ class DulcificumConan(ConanFile):
         if self.options.with_apps:
             self.requires("docopt.cpp/0.6.3")
         if self.options.with_python_bindings:
-            self.requires("cpython/3.10.4@ultimaker/stable")
+            self.requires("cpython/3.10.4@lulzbot/stable")
             self.requires("pybind11/2.10.4")
 
     def build_requirements(self):
-        self.test_requires("standardprojectsettings/[>=0.1.0]@ultimaker/stable")
+        self.test_requires("standardprojectsettings/[>=0.1.0]@lulzbot/stable")
         if self._run_tests:
             self.test_requires("gtest/[>=1.12.1]")
 
