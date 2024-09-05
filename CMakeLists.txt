@@ -5,6 +5,8 @@ find_package(standardprojectsettings REQUIRED)
 option(EXTENSIVE_WARNINGS "Build with all warnings" ON)
 option(ENABLE_TESTS "Build with unit test" ON)
 option(WITH_APPS "Build with apps" ON)
+option(WITH_JS_BINDINGS "Build with JavaScript Emscripten bindings" OFF)
+
 if(WITH_APPS)
     set(APP_VERSION "0.1.0" CACHE STRING "Version of the translator app" )
     message(STATUS "Configuring translator app version: ${APP_VERSION}")
@@ -29,16 +31,14 @@ set(DULCIFICUMLE_SRC
         src/gcode/ast/ast.cpp
         src/gcode/ast/entries.cpp
         src/gcode/parse.cpp
-
         src/miracle_jtp/mgjtp_command_to_json.cpp
         src/miracle_jtp/mgjtp_json_to_command.cpp
-
         src/gcode/gcode_to_command.cpp
-
         src/utils/io.cpp
         src/command_types.cpp
 )
-add_library(dulcificumle ${DULCIFICUMLE_SRC})
+add_library(dulcificumle STATIC ${DULCIFICUMLE_SRC})
+
 target_link_libraries(dulcificumle
         PUBLIC
         nlohmann_json::nlohmann_json
@@ -54,10 +54,18 @@ target_include_directories(dulcificumle
 
 target_compile_definitions(dulcificumle PRIVATE DULCIFICUM_VERSION="${DULCIFICUM_VERSION}")
 
-use_threads(dulcificumle)
+if (NOT WITH_JS_BINDINGS)
+    use_threads(dulcificumle)
+endif ()
+
 enable_sanitizers(dulcificumle)
 if (${EXTENSIVE_WARNINGS})
     set_project_warnings(dulcificumle)
+endif ()
+
+# --- Setup JavaScript bindings ---
+if (WITH_JS_BINDINGS)
+    add_subdirectory(DulcificumJS/cpp)
 endif ()
 
 # --- Setup Python bindings ---
