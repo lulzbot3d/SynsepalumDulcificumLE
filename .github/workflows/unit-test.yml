@@ -52,3 +52,4 @@ jobs:
       unit_test_cmd: 'ctest --output-junit unit_test.xml'
       unit_test_dir: 'build/Release'
       build: true
+    secrets: inherit
