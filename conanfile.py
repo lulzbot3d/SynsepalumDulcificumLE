@@ -106,7 +106,7 @@ class DulcificumLEConan(ConanFile):
             self.requires("docopt.cpp/0.6.3")
         if self.options.get_safe("with_python_bindings", False):
             self.requires("cpython/3.10.4@lulzbot/stable")
-            self.requires("pybind11/2.10.4")
+            self.requires("pybind11/2.13.5")
 
     def build_requirements(self):
         self.test_requires("standardprojectsettings/[>=0.1.0]@lulzbot/stable")
@@ -142,13 +142,13 @@ class DulcificumLEConan(ConanFile):
             tc.variables["WITH_JS_BINDINGS"] = False
         tc.variables["WITH_PYTHON_BINDINGS"] = self.options.get_safe("with_python_bindings", False)
         if self.options.get_safe("with_python_bindings", False):
-            tc.variables["PYTHON_EXECUTABLE"] = self.deps_user_info["cpython"].python.replace("\\", "/")
-            tc.variables["Python_USE_STATIC_LIBS"] = not self.options["cpython"].shared
             tc.variables["Python_ROOT_DIR"] = self.deps_cpp_info["cpython"].rootpath.replace("\\", "/")
-            tc.variables["Python_FIND_FRAMEWORK"] = "NEVER"
-            tc.variables["Python_FIND_REGISTRY"] = "NEVER"
-            tc.variables["Python_FIND_IMPLEMENTATIONS"] = "CPython"
+            tc.variables["Python_USE_STATIC_LIBS"] = not self.options["cpython"].shared
             tc.variables["Python_FIND_STRATEGY"] = "LOCATION"
+            tc.variables["Python_FIND_REGISTRY"] = "NEVER"
+            tc.variables["Python_FIND_FRAMEWORK"] = "NEVER"
+            tc.variables["Python_FIND_IMPLEMENTATIONS"] = "CPython"
+            tc.variables["PYTHON_EXECUTABLE"] = self.deps_user_info["cpython"].python.replace("\\", "/")
             tc.variables["PYDULCIFICUM_VERSION"] = self.version
 
         if is_msvc(self):
@@ -182,6 +182,7 @@ class DulcificumLEConan(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+
     def deploy(self):
         copy(self, "dulcificum_js*", src=os.path.join(self.package_folder, "lib"), dst=self.install_folder)
 

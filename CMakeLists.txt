@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.27)
 project(dulcificumle)
 
 find_package(standardprojectsettings REQUIRED)
