@@ -105,7 +105,7 @@ class DulcificumLEConan(ConanFile):
         if self.options.with_apps:
             self.requires("docopt.cpp/0.6.3")
         if self.options.get_safe("with_python_bindings", False):
-            self.requires("cpython/3.10.4@lulzbot/stable")
+            self.requires("cpython/3.12.2")
             self.requires("pybind11/2.13.5")
 
     def build_requirements(self):
@@ -142,13 +142,6 @@ class DulcificumLEConan(ConanFile):
             tc.variables["WITH_JS_BINDINGS"] = False
         tc.variables["WITH_PYTHON_BINDINGS"] = self.options.get_safe("with_python_bindings", False)
         if self.options.get_safe("with_python_bindings", False):
-            tc.variables["Python_ROOT_DIR"] = self.deps_cpp_info["cpython"].rootpath.replace("\\", "/")
-            tc.variables["Python_USE_STATIC_LIBS"] = not self.options["cpython"].shared
-            tc.variables["Python_FIND_STRATEGY"] = "LOCATION"
-            tc.variables["Python_FIND_REGISTRY"] = "NEVER"
-            tc.variables["Python_FIND_FRAMEWORK"] = "NEVER"
-            tc.variables["Python_FIND_IMPLEMENTATIONS"] = "CPython"
-            tc.variables["PYTHON_EXECUTABLE"] = self.deps_user_info["cpython"].python.replace("\\", "/")
             tc.variables["PYDULCIFICUM_VERSION"] = self.version
 
         if is_msvc(self):
