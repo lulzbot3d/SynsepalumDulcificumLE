@@ -1,5 +1,5 @@
 {
-  "name": "@lulzbot/dulcificumjs",
+  "name": "@ultimaker/dulcificumjs",
   "version": "0.1.0",
   "description": "DulcificumJS is a TS component to run Dulcificum in a browser",
   "main": "dist/index.js",
@@ -14,19 +14,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lulzbot3d/SynsepalumDulcificumLE.git"
+    "url": "https://github.com/Ultimaker/synsepalum-dulcificum.git"
   },
   "keywords": [
-    "CuraLE",
+    "Cura",
     "Dulcificum",
     "Configuration"
   ],
-  "author": "UltiMaker, FAME3D LLC",
+  "author": "UltiMaker",
   "license": "",
   "bugs": {
-    "url": "https://github.com/lulzbot3d/SynsepalumDulcificumLE/issues"
+    "url": "https://github.com/Ultimaker/synsepalum-dulcificum/issues"
   },
-  "homepage": "https://github.com/lulzbot3d/SynsepalumDulcificumLE#readme",
+  "homepage": "https://github.com/Ultimaker/synsepalum-dulcificum#readme",
   "dependencies": {
     "emscripten": "^0.0.2-beta"
   },
