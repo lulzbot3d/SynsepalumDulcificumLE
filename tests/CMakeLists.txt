@@ -8,7 +8,7 @@ set(UNIT_TEST_FILES
         miracle_jsontoolpath_dialect_test.cpp
 )
 
-add_executable(dulcificumle_unit_tester
+add_executable(dulcificum_unit_tester
     ${UNIT_TEST_FILES}
     test_data_dir.h
 )

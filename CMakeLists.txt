@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.27)
-project(dulcificumle)
+cmake_minimum_required(VERSION 3.23)
+project(dulcificum)
 
 find_package(standardprojectsettings REQUIRED)
 option(EXTENSIVE_WARNINGS "Build with all warnings" ON)
@@ -30,7 +30,7 @@ find_package(range-v3 REQUIRED)
 find_package(ctre REQUIRED)
 
 # --- Setup the shared C++ mgjtp library ---
-set(DULCIFICUMLE_SRC
+set(DULCIFICUM_SRC
         src/gcode/ast/ast.cpp
         src/gcode/ast/entries.cpp
         src/gcode/parse.cpp
@@ -40,7 +40,7 @@ set(DULCIFICUMLE_SRC
         src/utils/io.cpp
         src/command_types.cpp
 )
-add_library(dulcificumle STATIC ${DULCIFICUMLE_SRC})
+add_library(dulcificum STATIC ${DULCIFICUM_SRC})
 
 target_link_libraries(dulcificum
         PUBLIC
