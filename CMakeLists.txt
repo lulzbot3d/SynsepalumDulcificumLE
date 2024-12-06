@@ -8,18 +8,21 @@ option(WITH_APPS "Build with apps" ON)
 option(WITH_JS_BINDINGS "Build with JavaScript Emscripten bindings" OFF)
 
 if(WITH_APPS)
-    set(APP_VERSION "0.1.0" CACHE STRING "Version of the translator app" )
+    set(APP_VERSION "0.2.1" CACHE STRING "Version of the translator app" )
     message(STATUS "Configuring translator app version: ${APP_VERSION}")
 endif ()
 
 option(WITH_PYTHON_BINDINGS "Build with Python bindings: `pyDulcificum`" ON)
 if(WITH_PYTHON_BINDINGS)
-    set(PYDULCIFICUM_VERSION "0.1.0" CACHE STRING "Version of the pyDulcificum python bindings" )
+    set(PYDULCIFICUM_VERSION "0.2.1" CACHE STRING "Version of the pyDulcificum python bindings" )
     message(STATUS "Configuring pyDulcificum version: ${PYDULCIFICUM_VERSION}")
 endif ()
 
-set(DULCIFICUM_VERSION "0.1.0" CACHE STRING "Version of the dulcificum library" )
+if(NOT DEFINED DULCIFICUM_VERSION)
+    message(FATAL_ERROR "DULCIFICUM_VERSION is not defined!")
+endif()
 message(STATUS "Configuring Dulcificum version: ${DULCIFICUM_VERSION}")
+message(STATUS "Configuring Dulcificum hash: ${GIT_COMMIT_HASH}")
 
 find_package(nlohmann_json REQUIRED)
 find_package(spdlog REQUIRED)
@@ -39,28 +42,32 @@ set(DULCIFICUMLE_SRC
 )
 add_library(dulcificumle STATIC ${DULCIFICUMLE_SRC})
 
-target_link_libraries(dulcificumle
+target_link_libraries(dulcificum
         PUBLIC
         nlohmann_json::nlohmann_json
         ctre::ctre
         range-v3::range-v3
         spdlog::spdlog)
 
-target_include_directories(dulcificumle
+target_include_directories(dulcificum
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_compile_definitions(dulcificumle PRIVATE DULCIFICUM_VERSION="${DULCIFICUM_VERSION}")
+target_compile_definitions(dulcificum
+    PUBLIC
+    DULCIFICUM_VERSION="${DULCIFICUM_VERSION}"
+    DULCIFICUM_HASH="${GIT_COMMIT_HASH}"
+)
 
 if (NOT WITH_JS_BINDINGS)
-    use_threads(dulcificumle)
+    use_threads(dulcificum)
 endif ()
 
-enable_sanitizers(dulcificumle)
+enable_sanitizers(dulcificum)
 if (${EXTENSIVE_WARNINGS})
-    set_project_warnings(dulcificumle)
+    set_project_warnings(dulcificum)
 endif ()
 
 # --- Setup JavaScript bindings ---
@@ -75,7 +82,7 @@ endif ()
 
 # --- Setup tests ---
 if (ENABLE_TESTS)
-    add_subdirectory(test)
+    add_subdirectory(tests)
 endif ()
 
 # --- Setup Apps ---

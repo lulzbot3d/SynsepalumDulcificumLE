@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Sync pip requirements
-        run: curl -O https://raw.githubusercontent.com/lulzbot3d/cura-le-workflows/main/.github/workflows/requirements-runner.txt
+        run: curl -O https://raw.githubusercontent.com/lulzbot3d/CuraLE-Workflows/main/.github/workflows/requirements-runner.txt
         working-directory: .github/workflows
 
       - name: Setup Python and pip
@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir runner_scripts
           cd runner_scripts
-          curl -O https://raw.githubusercontent.com/lulzbot3d/cura-le-workflows/main/runner_scripts/ubuntu_setup.sh
+          curl -O https://raw.githubusercontent.com/lulzbot3d/CuraLE_Workflows/main/runner_scripts/ubuntu_setup.sh
           chmod +x ubuntu_setup.sh
           sudo ./ubuntu_setup.sh
 
@@ -46,10 +46,14 @@ jobs:
       - name: Create default Conan profile
         run: conan profile new default --detect
 
+      # FIXME: Once merged to main: conan config install https://github.com/Ultimaker/conan-config.git -a "-b runner/${{ runner.os }}/${{ runner.arch }}"
       - name: Get Conan configuration
         run: |
-          conan config install https://github.com/lulzbot3d/conan-config-le.git
-          conan config install https://github.com/lulzbot3d/conan-config-le.git -a "-b runner/${{ runner.os }}/${{ runner.arch }}"
+          conan config install https://github.com/lulzbot3d/Conan_LulzBot_Config.git
+          conan config install https://github.com/lulzbot3d/Conan_LulzBot_Config.git -a "-b runner/${{ runner.os }}/${{ runner.arch }}"
+
+      - name: Add runner credentials to cura-le-conan2 remote
+        run: conan user -p ${{ secrets.CONAN_PASS }} -r cura-le-conan2 ${{ secrets.CONAN_USER }}
 
       - name: Cache Conan packages
         uses: actions/cache@v3
@@ -82,3 +86,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: DulcificumJS
+
+      - name: Upload the Package(s)
+        if: ${{ always() }}
+        run: |
+          conan remove "curale_private_data/*" --force
+          conan remove "fdm_materialsle/*" --force
+          conan upload "*" -r cura-le-conan2 --all -c

@@ -7,19 +7,19 @@ from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.env import VirtualBuildEnv
 from conan.tools.files import copy, mkdir, AutoPackager, update_conandata
 from conan.tools.microsoft import check_min_vs, is_msvc_static_runtime, is_msvc
-from conan.tools.scm import Version
+from conan.tools.scm import Version, Git
+from conan.errors import ConanException
 
-
-required_conan_version = ">=1.58.0 <2.0.0"
+required_conan_version = ">=2.7.0"
 
 
 class DulcificumLEConan(ConanFile):
-    name = "dulcificumle"
+    name = "dulcificum"
     description = "Dulcificum changes the flavor, or dialect, of 3d printer commands"
-    author = "UltiMaker, FAME3D LLC."
+    author = "UltiMaker"
     license = ""
     url = "https://github.com/lulzbot3d/SynsepalumDulcificumLE"
-    homepage = "https://lulzbot.com/"
+    homepage = "https://ultimaker.com"
     topics = ("cura", "curaengine", "gcode-generation", "3D-printing", "miraclegrue", "toolpath")
     package_type = "library"
     settings = "os", "arch", "compiler", "build_type"
@@ -60,16 +60,23 @@ class DulcificumLEConan(ConanFile):
     def _run_tests(self):
         if self.settings.compiler == "apple-clang" and Version(self.settings.compiler.version) <= Version("14"):
             return False
-        return not self.conf.get("tools.build:skip_test", False, check_type = bool)
+        return not self.conf.get("tools.build:skip_test", False, check_type=bool)
 
     def export(self):
-        update_conandata(self, {"version": self.version})
+        try:
+            git = Git(self)
+            commit_hash = git.get_commit()
+        except ConanException as e:
+            commit_hash = "unknown"
+            self.output.error(f"An error occurred: {e}")
+        update_conandata(self, {"version": self.version, "commit_hash": commit_hash})
 
     def export_sources(self):
         copy(self, "CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
         copy(self, "*", os.path.join(self.recipe_folder, "src"), os.path.join(self.export_sources_folder, "src"))
-        copy(self, "*", os.path.join(self.recipe_folder, "include"), os.path.join(self.export_sources_folder, "include"))
-        copy(self, "*", os.path.join(self.recipe_folder, "test"), os.path.join(self.export_sources_folder, "test"))
+        copy(self, "*", os.path.join(self.recipe_folder, "include"),
+             os.path.join(self.export_sources_folder, "include"))
+        copy(self, "*", os.path.join(self.recipe_folder, "tests"), os.path.join(self.export_sources_folder, "tests"))
         copy(self, "*", os.path.join(self.recipe_folder, "apps"), os.path.join(self.export_sources_folder, "apps"))
         copy(self, "*", os.path.join(self.recipe_folder, "pyDulcificum"), os.path.join(self.export_sources_folder, "pyDulcificum"))
         copy(self, "*", os.path.join(self.recipe_folder, "DulcificumJS"), os.path.join(self.export_sources_folder, "DulcificumJS"))
@@ -81,8 +88,6 @@ class DulcificumLEConan(ConanFile):
             del self.options.with_python_bindings
 
     def configure(self):
-        if self.options.shared:
-            self.options.rm_safe("fPIC")
         if self.options.get_safe("with_python_bindings", False):
             self.options["cpython"].shared = True
 
@@ -96,17 +101,21 @@ class DulcificumLEConan(ConanFile):
         self.cpp.package.libdirs = ["lib"]
         self.cpp.package.bindirs = ["bin"]
 
+        if self.options.with_python_bindings:
+            self.layouts.build.runenv_info.prepend_path("PYTHONPATH", "pyDulcificum")
+            self.layouts.package.runenv_info.prepend_path("PYTHONPATH", os.path.join("lib", "pyDulcificum"))
+
     def requirements(self):
-        self.requires("nlohmann_json/3.11.2", transitive_headers = True)
-        self.requires("range-v3/0.12.0")
-        self.requires("spdlog/1.12.0")
-        self.requires("fmt/10.1.1")
-        self.requires("ctre/3.7.2")
+        self.requires("nlohmann_json/3.11.2", transitive_headers=True)
+        self.requires("range-v3/0.12.0", transitive_headers=True)
+        self.requires("spdlog/1.12.0", transitive_headers=True)
+        self.requires("fmt/10.2.1", transitive_headers=True)
+        self.requires("ctre/3.7.2", transitive_headers=True)
         if self.options.with_apps:
             self.requires("docopt.cpp/0.6.3")
         if self.options.get_safe("with_python_bindings", False):
             self.requires("cpython/3.12.2")
-            self.requires("pybind11/2.13.5")
+            self.requires("pybind11/2.11.1")
 
     def build_requirements(self):
         self.test_requires("standardprojectsettings/[>=0.1.0]@lulzbot/stable")
@@ -131,7 +140,7 @@ class DulcificumLEConan(ConanFile):
         tc.variables["ENABLE_TESTS"] = self._run_tests
         tc.variables["EXTENSIVE_WARNINGS"] = self.options.enable_extensive_warnings
         tc.variables["DULCIFICUM_VERSION"] = self.version
-
+        tc.variables["GIT_COMMIT_HASH"] = self.conan_data["commit_hash"]
         tc.variables["WITH_APPS"] = self.options.with_apps
         if self.options.with_apps:
             tc.variables["APP_VERSION"] = self.version
@@ -140,6 +149,7 @@ class DulcificumLEConan(ConanFile):
             tc.variables["WITH_JS_BINDINGS"] = True
         else:
             tc.variables["WITH_JS_BINDINGS"] = False
+
         tc.variables["WITH_PYTHON_BINDINGS"] = self.options.get_safe("with_python_bindings", False)
         if self.options.get_safe("with_python_bindings", False):
             tc.variables["PYDULCIFICUM_VERSION"] = self.version
@@ -152,8 +162,8 @@ class DulcificumLEConan(ConanFile):
         tc = CMakeDeps(self)
         tc.generate()
 
-        tc = VirtualBuildEnv(self)
-        tc.generate(scope = "build")
+        vb = VirtualBuildEnv(self)
+        vb.generate(scope="build")
 
         for dep in self.dependencies.values():
             if len(dep.cpp_info.libdirs) > 0:
@@ -162,14 +172,15 @@ class DulcificumLEConan(ConanFile):
             if len(dep.cpp_info.bindirs) > 0:
                 copy(self, "*.dll", dep.cpp_info.bindirs[0], self.build_folder)
             if self._run_tests:
-                test_path = os.path.join(self.build_folder,  "tests")
+                test_path = os.path.join(self.build_folder, "tests")
                 if not os.path.exists(test_path):
                     mkdir(self, test_path)
                 if len(dep.cpp_info.libdirs) > 0:
-                    copy(self, "*.dylib", dep.cpp_info.libdirs[0], os.path.join(self.build_folder,  "tests"))
-                    copy(self, "*.dll", dep.cpp_info.libdirs[0], os.path.join(self.build_folder,  "tests"))
+                    copy(self, "*.dylib", dep.cpp_info.libdirs[0], os.path.join(self.build_folder, "tests"))
+                    copy(self, "*.dll", dep.cpp_info.libdirs[0], os.path.join(self.build_folder, "tests"))
                 if len(dep.cpp_info.bindirs) > 0:
-                    copy(self, "*.dll", dep.cpp_info.bindirs[0], os.path.join(self.build_folder,  "tests"))
+                    copy(self, "*.dll", dep.cpp_info.bindirs[0], os.path.join(self.build_folder, "tests"))
+
 
     def build(self):
         cmake = CMake(self)
@@ -177,7 +188,7 @@ class DulcificumLEConan(ConanFile):
         cmake.build()
 
     def deploy(self):
-        copy(self, "dulcificum_js*", src=os.path.join(self.package_folder, "lib"), dst=self.install_folder)
+        copy(self, "dulcificum_js*", src=os.path.join(self.package_folder, "lib"), dst=self.deploy_folder)
 
     def package(self):
         copy(self, pattern="LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self.source_folder)
@@ -190,7 +201,6 @@ class DulcificumLEConan(ConanFile):
         packager.run()
 
     def package_info(self):
-        if self.in_local_cache:
-            self.runenv_info.append_path("PYTHONPATH", os.path.join(self.package_folder, "lib", "pyDulcificum"))
-        else:
-            self.runenv_info.append_path("PYTHONPATH", os.path.join(self.build_folder, "pyDulcificum"))
+        if self.options.with_python_bindings:
+            self.conf_info.define("user.dulcificum:pythonpath",
+                                  os.path.join(self.package_folder, "lib", "pyDulcificum"))

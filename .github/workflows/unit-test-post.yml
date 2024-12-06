@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish-test-results:
-    uses: lulzbot3d/cura-le-workflows/.github/workflows/unit-test-post.yml@main
+    uses: lulzbot3d/CuraLE_Workflows/.github/workflows/unit-test-post.yml@main
     with:
-      event: ${{ github.event.workflow_run.event }}
-      conclusion: ${{ github.event.workflow_run.conclusion }}
+      workflow_run_json: ${{ toJSON(github.event.workflow_run) }}
+    secrets: inherit

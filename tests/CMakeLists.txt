@@ -1,4 +1,4 @@
-message(STATUS "dulcificumle: Compiling with Tests")
+message(STATUS "dulcificum: Compiling with Tests")
 enable_testing()
 
 find_package(GTest REQUIRED)
@@ -13,4 +13,6 @@ add_executable(dulcificumle_unit_tester
     test_data_dir.h
 )
 
-target_link_libraries(dulcificumle_unit_tester PUBLIC dulcificumle GTest::gtest GTest::gmock)
+target_link_libraries(dulcificum_unit_tester PUBLIC dulcificum GTest::gtest GTest::gmock)
+
+add_test(dulcificum_unit_tester dulcificum_unit_tester)
