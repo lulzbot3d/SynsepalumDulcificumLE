@@ -10,5 +10,5 @@ jobs:
   update-fork:
     uses: lulzbot3d/CuraLE_Workflows/.github/workflows/update-lulzbot-forks.yml@main
     with:
-      repo: 'synsepalum_dulcificum'
+      repo: 'synsepalum-dulcificum'
     secrets: inherit
