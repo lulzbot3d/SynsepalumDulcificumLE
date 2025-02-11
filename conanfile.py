@@ -22,7 +22,7 @@ class DulcificumLEConan(ConanFile):
     homepage = "https://ultimaker.com"
     topics = ("cura", "curaengine", "gcode-generation", "3D-printing", "miraclegrue", "toolpath")
     package_type = "library"
-    python_requires = "npmpackage/[>=1.0.0]@ultimaker/stable"
+    python_requires = "npmpackage/[>=1.0.0]@lulzbot/stable"
     settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
